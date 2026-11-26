@@ -159,6 +159,10 @@
           "minimum": 0,
           "default": 0,
           "description": "Number of leftmost columns to pin/freeze."
+        },
+        "zebraStriping": {
+          "type": "boolean",
+          "description": "Enable or disable alternating row background colors (zebra striping) for this file."
         }
       }
     },
@@ -335,6 +339,15 @@
         "wrap": {
           "type": "boolean",
           "description": "Whether long text wraps inside this cell or range."
+        },
+        "align": {
+          "type": "string",
+          "enum": ["left", "center", "right"],
+          "description": "Horizontal text alignment for this cell or range."
+        },
+        "numberFormat": {
+          "type": "string",
+          "description": "Excel-compatible number format string (ECMA-376 / numfmt, e.g. '#,##0', '0,000', '¥#,##0', '0.0%')."
         }
       }
     },
@@ -378,6 +391,10 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "Allowed values when type is 'enum'."
+        },
+        "numberFormat": {
+          "type": "string",
+          "description": "Excel-compatible number format string for the column (e.g. '#,##0', '0,000', '¥#,##0')."
         },
         "style": {
           "$ref": "#/definitions/styleRef"
