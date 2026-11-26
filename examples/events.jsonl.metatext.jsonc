@@ -1,0 +1,67 @@
+{
+  "$schema": "../schemas/v0.1/metatext.schema.json",
+  "version": "0.1",
+  "format": "jsonl",
+  "readOnly": true,
+
+  // Flatten nested JSON keys up to depth 2 (e.g. user.id, metrics.latency_ms)
+  "jsonl": {
+    "flattenDepth": 2,
+    "arrayMode": "json",
+    "encoding": "utf-8",
+    "lineEnding": "lf"
+  },
+
+  "table": {
+    "fontFamily": "'Consolas', 'JetBrains Mono', monospace",
+    "fontSize": 12,
+    "defaultRowHeight": 26,
+    "freezeColumns": 2
+  },
+
+  "view": {
+    "filterPresets": [
+      {
+        "name": "Errors + Context",
+        "query": "level:ERROR",
+        "contextRows": 2
+      },
+      {
+        "name": "Slow Requests (>= 500ms)",
+        "query": "metrics.latency_ms:>=500"
+      }
+    ],
+    "markers": [
+      { "row": 3, "color": "rose", "note": "Upstream timeout spike" }
+    ]
+  },
+
+  "styles": {
+    "errorRow": { "backgroundColor": "rgba(244, 63, 94, 0.16)" },
+    "warnRow": { "backgroundColor": "rgba(245, 158, 11, 0.16)" }
+  },
+
+  "columns": {
+    "timestamp": { "label": "Timestamp", "width": 190 },
+    "level": { "label": "Level", "width": 80, "align": "center" },
+    "user.id": { "label": "User ID", "width": 110 },
+    "metrics.latency_ms": { "label": "Latency (ms)", "width": 110, "align": "right", "type": "number" },
+    "message": { "label": "Message", "width": 360 },
+    "error.code": { "label": "Error Code", "width": 130 }
+  },
+
+  "rules": [
+    {
+      "name": "Highlight ERROR rows",
+      "target": "row",
+      "when": { "column": "level", "operator": "equals", "value": "ERROR" },
+      "style": "errorRow"
+    },
+    {
+      "name": "Highlight WARN rows",
+      "target": "row",
+      "when": { "column": "level", "operator": "equals", "value": "WARN" },
+      "style": "warnRow"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "../schemas/v0.1/metatext.schema.json",
+  "version": "0.1",
+  "format": "log",
+  "readOnly": true,
+
+  // Split plain log lines into timestamp / level / logger / message columns
+  "log": {
+    "linePattern": "^(?<timestamp>\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?)\\s+\\[(?<level>[A-Z]+)\\]\\s+(?<logger>[\\w.-]+)\\s+-\\s+(?<message>.*)$",
+    "columnNames": ["timestamp", "level", "logger", "message"],
+    "timestampColumn": "timestamp",
+    "levelColumn": "level",
+    "multilinePattern": "^(\\s+at\\s+|Caused by:)",
+    "wordWrap": false,
+    "encoding": "utf-8"
+  },
+
+  "table": {
+    "fontFamily": "'Consolas', 'JetBrains Mono', monospace",
+    "fontSize": 12,
+    "defaultRowHeight": 24,
+    "freezeColumns": 2
+  },
+
+  "view": {
+    "activeFilter": "level:ERROR OR level:WARN",
+    "filterContextRows": 2,
+    "filterPresets": [
+      {
+        "name": "Errors + Context",
+        "query": "level:ERROR OR level:FATAL",
+        "contextRows": 5
+      },
+      {
+        "name": "Warnings & Errors",
+        "query": "level:ERROR OR level:WARN",
+        "contextRows": 2
+      }
+    ],
+    "markers": [
+      { "row": 124, "color": "rose", "note": "First DB timeout before reconnect" },
+      { "row": 318, "color": "amber", "note": "Retry queue saturated" }
+    ]
+  },
+
+  "styles": {
+    "errorRow": { "backgroundColor": "rgba(244, 63, 94, 0.16)", "color": "#fecdd3" },
+    "warnRow": { "backgroundColor": "rgba(245, 158, 11, 0.14)", "color": "#fde68a" },
+    "monoMuted": { "color": "#94a3b8" }
+  },
+
+  "columns": {
+    "timestamp": { "label": "Time", "width": 190, "style": "monoMuted" },
+    "level": { "label": "Level", "width": 80, "align": "center" },
+    "logger": { "label": "Logger", "width": 180 },
+    "message": { "label": "Message", "width": 640 }
+  },
+
+  "rules": [
+    {
+      "name": "Highlight ERROR rows",
+      "target": "row",
+      "when": { "column": "level", "operator": "equals", "value": "ERROR" },
+      "style": "errorRow"
+    },
+    {
+      "name": "Highlight WARN rows",
+      "target": "row",
+      "when": { "column": "level", "operator": "equals", "value": "WARN" },
+      "style": "warnRow"
+    }
+  ]
+}

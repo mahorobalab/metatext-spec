@@ -1,0 +1,30 @@
+{
+  "$schema": "../schemas/v0.1/metatext.schema.json",
+  "version": "0.1",
+  "format": "tsv",
+
+  "csv": {
+    "hasHeader": true,
+    "delimiter": "\t",
+    "encoding": "utf-8",
+    "lineEnding": "lf"
+  },
+
+  "table": {
+    "freezeColumns": 1,
+    "defaultRowHeight": 26
+  },
+
+  "view": {
+    "sort": [
+      { "column": "p95_ms", "direction": "desc" }
+    ]
+  },
+
+  "columns": {
+    "endpoint": { "width": 260 },
+    "requests": { "width": 100, "align": "right", "type": "number" },
+    "p95_ms": { "width": 100, "align": "right", "type": "number" },
+    "error_rate": { "width": 110, "align": "right", "type": "number" }
+  }
+}

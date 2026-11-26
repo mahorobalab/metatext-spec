@@ -1,0 +1,417 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mahorobalab.github.io/metatext-spec/schemas/v0.1/metatext.schema.json",
+  "title": "MetaText Sidecar Metadata",
+  "description": "Sidecar metadata (.metatext.jsonc) for plain-text tabular and log files (CSV, TSV, Log, JSONL).",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^x-": {
+      "description": "Custom vendor or tool extension fields preserved across editors."
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema URL for editor completion and validation."
+    },
+    "version": {
+      "type": "string",
+      "const": "0.1",
+      "description": "MetaText schema version."
+    },
+    "format": {
+      "type": "string",
+      "enum": ["csv", "tsv", "log", "jsonl", "text"],
+      "description": "Target plain-text format. Omit to auto-detect from the target file extension."
+    },
+    "readOnly": {
+      "type": "boolean",
+      "description": "Open the target file in read-only mode by default (e.g. true for log files until explicitly unlocked)."
+    },
+    "csv": {
+      "type": "object",
+      "description": "CSV/TSV dialect settings. Omit properties to use auto-detection.",
+      "additionalProperties": false,
+      "properties": {
+        "hasHeader": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether the first row is a header row."
+        },
+        "delimiter": {
+          "type": "string",
+          "enum": [",", "\t", ";", "|"],
+          "description": "Column delimiter character."
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "utf-8-bom", "shift-jis"],
+          "description": "Character encoding preserved on save."
+        },
+        "lineEnding": {
+          "type": "string",
+          "enum": ["lf", "crlf"],
+          "description": "Line ending preserved on save."
+        }
+      }
+    },
+    "jsonl": {
+      "type": "object",
+      "description": "JSON Lines (.jsonl / .ndjson) flattening and parsing settings.",
+      "additionalProperties": false,
+      "properties": {
+        "flattenDepth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8,
+          "default": 2,
+          "description": "Maximum nesting depth for dot-notation flattening (e.g. 'user.name'). Deeper objects stay as compact JSON strings."
+        },
+        "arrayMode": {
+          "type": "string",
+          "enum": ["json", "join"],
+          "default": "json",
+          "description": "How array values are rendered in cells ('json' for compact JSON string, 'join' for comma-separated primitives)."
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "utf-8-bom", "shift-jis"],
+          "description": "Character encoding preserved on save."
+        },
+        "lineEnding": {
+          "type": "string",
+          "enum": ["lf", "crlf"],
+          "description": "Line ending preserved on save."
+        }
+      }
+    },
+    "log": {
+      "type": "object",
+      "description": "Log parsing and viewing settings for .log and unstructured text files.",
+      "additionalProperties": false,
+      "properties": {
+        "linePattern": {
+          "type": "string",
+          "description": "Regular expression used to split each log line into columns (supports named or numbered capture groups)."
+        },
+        "columnNames": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional column names mapped to numbered capture groups when named groups are not used."
+        },
+        "timestampColumn": {
+          "type": "string",
+          "description": "Column key representing the log entry timestamp."
+        },
+        "levelColumn": {
+          "type": "string",
+          "description": "Column key representing the log severity level (e.g. ERROR, WARN, INFO)."
+        },
+        "multilinePattern": {
+          "type": "string",
+          "description": "Regular expression identifying continuation lines (e.g. stack traces) to group with the preceding log entry."
+        },
+        "wordWrap": {
+          "type": "boolean",
+          "default": false,
+          "description": "Default word wrap setting for log lines."
+        },
+        "encoding": {
+          "type": "string",
+          "enum": ["utf-8", "utf-8-bom", "shift-jis"],
+          "description": "Character encoding of the log file."
+        }
+      }
+    },
+    "table": {
+      "type": "object",
+      "description": "Table-wide appearance and layout settings.",
+      "additionalProperties": false,
+      "properties": {
+        "fontFamily": {
+          "type": "string",
+          "description": "Font family used in cells."
+        },
+        "fontSize": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 48,
+          "default": 13,
+          "description": "Base font size in pixels."
+        },
+        "defaultRowHeight": {
+          "type": "number",
+          "minimum": 18,
+          "maximum": 400,
+          "default": 28,
+          "description": "Default row height in pixels."
+        },
+        "headerHeight": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 200,
+          "default": 32,
+          "description": "Header row height in pixels."
+        },
+        "freezeColumns": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Number of leftmost columns to pin/freeze."
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "description": "Persistent view state (does not mutate source data).",
+      "additionalProperties": false,
+      "properties": {
+        "sort": {
+          "type": "array",
+          "description": "View-only sort order applied when opening the file.",
+          "items": {
+            "type": "object",
+            "required": ["column", "direction"],
+            "additionalProperties": false,
+            "properties": {
+              "column": {
+                "type": "string",
+                "description": "Column header name (if hasHeader=true) or 0-based index string (if hasHeader=false)."
+              },
+              "direction": {
+                "type": "string",
+                "enum": ["asc", "desc"]
+              }
+            }
+          }
+        },
+        "activeFilter": {
+          "type": "string",
+          "description": "Persisted filter query string applied on open."
+        },
+        "filterContextRows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 0,
+          "description": "Number of surrounding context rows to keep around matched rows (grep -C)."
+        },
+        "filterPresets": {
+          "type": "array",
+          "description": "Named filter presets for one-click switching.",
+          "items": {
+            "type": "object",
+            "required": ["name", "query"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "query": { "type": "string" },
+              "contextRows": { "type": "integer", "minimum": 0, "maximum": 100 },
+              "collapseColumn": { "type": "string" }
+            }
+          }
+        },
+        "markers": {
+          "type": "array",
+          "description": "Bookmarked/marked data rows for rapid navigation and inspection (0-based raw data row index).",
+          "items": {
+            "type": "object",
+            "required": ["row"],
+            "additionalProperties": false,
+            "properties": {
+              "row": { "type": "integer", "minimum": 0 },
+              "color": {
+                "type": "string",
+                "enum": ["amber", "rose", "emerald", "sky", "violet"],
+                "default": "amber"
+              },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "styles": {
+      "type": "object",
+      "description": "Named reusable style palette (similar to Excel styles.xml). Referenced by name from columns, rules, ranges, rows, or cells.",
+      "additionalProperties": {
+        "$ref": "#/definitions/cellStyle"
+      }
+    },
+    "columns": {
+      "type": "object",
+      "description": "Per-column settings keyed by header name (hasHeader=true) or 0-based index string (hasHeader=false).",
+      "additionalProperties": {
+        "$ref": "#/definitions/columnConfig"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "description": "Conditional formatting rules evaluated in order.",
+      "items": {
+        "$ref": "#/definitions/conditionalRule"
+      }
+    },
+    "ranges": {
+      "type": "array",
+      "description": "Rectangular range style overrides evaluated in order (similar to Excel sqref).",
+      "items": {
+        "type": "object",
+        "required": ["ref", "style"],
+        "additionalProperties": false,
+        "properties": {
+          "ref": {
+            "type": "string",
+            "pattern": "^[0-9]+:[0-9]+\\.\\.[0-9]+:[0-9]+$",
+            "description": "0-based inclusive range in '<startRow>:<startCol>..<endRow>:<endCol>' format (e.g. '10:0..13:5')."
+          },
+          "style": {
+            "$ref": "#/definitions/styleRef"
+          }
+        }
+      }
+    },
+    "rows": {
+      "type": "object",
+      "description": "Per-row overrides keyed by 0-based data row index string.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "height": {
+            "type": "number",
+            "minimum": 18,
+            "maximum": 800,
+            "description": "Row height in pixels."
+          },
+          "style": {
+            "$ref": "#/definitions/styleRef"
+          }
+        }
+      }
+    },
+    "cells": {
+      "type": "object",
+      "description": "Per-cell style overrides keyed by '<rowIndex>:<colKey>' (e.g. '14:0' or '14:status').",
+      "additionalProperties": {
+        "$ref": "#/definitions/styleRef"
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Namespaced tool-specific extension settings preserved without modification by other tools."
+    }
+  },
+  "definitions": {
+    "styleRef": {
+      "description": "Either a named style key defined in top-level 'styles', or an inline cellStyle object.",
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "$ref": "#/definitions/cellStyle"
+        }
+      ]
+    },
+    "cellStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bold": { "type": "boolean" },
+        "italic": { "type": "boolean" },
+        "color": {
+          "type": "string",
+          "description": "CSS color string for text (e.g. '#ff5555')."
+        },
+        "backgroundColor": {
+          "type": "string",
+          "description": "CSS color string for cell background (e.g. 'rgba(0, 122, 204, 0.15)')."
+        },
+        "fontFamily": { "type": "string" },
+        "fontSize": { "type": "number", "minimum": 8, "maximum": 48 }
+      }
+    },
+    "columnConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Display alias shown in the column header."
+        },
+        "width": {
+          "type": "number",
+          "minimum": 24,
+          "maximum": 2000,
+          "description": "Column width in pixels."
+        },
+        "visible": {
+          "type": "boolean",
+          "default": true
+        },
+        "align": {
+          "type": "string",
+          "enum": ["left", "center", "right"]
+        },
+        "wrap": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether long text wraps within the cell."
+        },
+        "readonly": {
+          "type": "boolean",
+          "default": false
+        },
+        "type": {
+          "type": "string",
+          "enum": ["text", "number", "boolean", "enum", "date"],
+          "default": "text"
+        },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Allowed values when type is 'enum'."
+        },
+        "style": {
+          "$ref": "#/definitions/styleRef"
+        }
+      }
+    },
+    "conditionalRule": {
+      "type": "object",
+      "required": ["when", "style"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Optional human-readable rule description."
+        },
+        "target": {
+          "type": "string",
+          "enum": ["cell", "row"],
+          "default": "cell",
+          "description": "Apply style to the matched cell only, or the entire row."
+        },
+        "when": {
+          "type": "object",
+          "required": ["column", "operator"],
+          "additionalProperties": false,
+          "properties": {
+            "column": { "type": "string" },
+            "operator": {
+              "type": "string",
+              "enum": ["equals", "notEquals", "contains", "startsWith", "regex", "empty", "notEmpty"]
+            },
+            "value": { "type": "string" }
+          }
+        },
+        "style": {
+          "$ref": "#/definitions/styleRef"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "../schemas/v0.1/metatext.schema.json",
+  "version": "0.1",
+  "format": "csv",
+
+  // ヘッダー行が無い仕様一覧 CSV の例
+  "csv": {
+    "hasHeader": false,
+    "encoding": "utf-8",
+    "lineEnding": "crlf"
+  },
+
+  "table": {
+    "fontFamily": "'Segoe UI', 'Yu Gothic UI', sans-serif",
+    "fontSize": 13,
+    "defaultRowHeight": 28,
+    // ID列（先頭1列）を左端に固定
+    "freezeColumns": 1
+  },
+
+  // ビュー上の並び順（CSV本体は書き換えない）
+  "view": {
+    "sort": [
+      { "column": "0", "direction": "asc" }
+    ]
+  },
+
+  // 名前付きスタイル辞書（再利用する装飾をまとめて定義）
+  "styles": {
+    "appBlue": { "backgroundColor": "rgba(59, 130, 246, 0.14)" },
+    "appGreen": { "backgroundColor": "rgba(16, 185, 129, 0.14)" },
+    "appAmber": { "backgroundColor": "rgba(245, 158, 11, 0.14)" },
+    "codeCell": { "fontFamily": "'Consolas', monospace" },
+    "noteHighlight": { "backgroundColor": "rgba(250, 204, 21, 0.16)", "italic": true }
+  },
+
+  // hasHeader=false のため、0始まりの列インデックスで紐づけ
+  "columns": {
+    "0": {
+      "label": "ID",
+      "width": 72,
+      "align": "center",
+      "readonly": true,
+      "style": {
+        "bold": true
+      }
+    },
+    "1": {
+      "label": "アプリ",
+      "width": 150,
+      "type": "enum",
+      "options": ["MH-TranStroke", "MH-NewsTicker", "MH-HachaMechaType"]
+    },
+    "2": {
+      "label": "大分類",
+      "width": 110
+    },
+    "3": {
+      "label": "中分類",
+      "width": 100
+    },
+    "4": {
+      "label": "設定キー",
+      "width": 200,
+      "style": "codeCell"
+    },
+    "5": {
+      // 長文の説明列は広めに確保＋折り返し
+      "label": "説明",
+      "width": 420,
+      "wrap": true
+    }
+  },
+
+  // アプリごとに背景色を薄く色分け（行の追加やソートでもズレない）
+  "rules": [
+    {
+      "name": "MH-TranStroke の強調",
+      "target": "cell",
+      "when": { "column": "1", "operator": "equals", "value": "MH-TranStroke" },
+      "style": "appBlue"
+    },
+    {
+      "name": "MH-NewsTicker の強調",
+      "target": "cell",
+      "when": { "column": "1", "operator": "equals", "value": "MH-NewsTicker" },
+      "style": "appGreen"
+    },
+    {
+      "name": "MH-HachaMechaType の強調",
+      "target": "cell",
+      "when": { "column": "1", "operator": "equals", "value": "MH-HachaMechaType" },
+      "style": "appAmber"
+    }
+  ],
+
+  // 矩形範囲に一括でスタイルを当てる例（startRow:startCol..endRow:endCol）
+  "ranges": [
+    { "ref": "14:2..16:5", "style": "noteHighlight" }
+  ],
+
+  // 特定の行だけ高さを広げる例
+  "rows": {
+    "14": { "height": 48 }
+  },
+
+  // 特定セルだけ個別に装飾する例（インライン直書きも可）
+  "cells": {
+    "14:5": { "bold": true }
+  }
+}
