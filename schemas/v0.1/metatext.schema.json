@@ -331,7 +331,11 @@
           "description": "CSS color string for cell background (e.g. 'rgba(0, 122, 204, 0.15)')."
         },
         "fontFamily": { "type": "string" },
-        "fontSize": { "type": "number", "minimum": 8, "maximum": 48 }
+        "fontSize": { "type": "number", "minimum": 8, "maximum": 48 },
+        "wrap": {
+          "type": "boolean",
+          "description": "Whether long text wraps inside this cell or range."
+        }
       }
     },
     "columnConfig": {
