@@ -32,7 +32,7 @@
 
 ## リファレンス実装
 
-- [MetaCSV (`mahorobalab/meta-csv`)](https://github.com/mahorobalab/meta-csv)
+- [MetaText Editor (`mahorobalab/metatext-editor`)](https://github.com/mahorobalab/metatext-editor)
 
 ## ライセンス
 

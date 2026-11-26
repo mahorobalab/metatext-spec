@@ -34,7 +34,7 @@ Place `<file>.metatext.jsonc` alongside your data file:
 
 ## Reference Implementation
 
-- [MetaCSV (`mahorobalab/meta-csv`)](https://github.com/mahorobalab/meta-csv)
+- [MetaText Editor (`mahorobalab/metatext-editor`)](https://github.com/mahorobalab/metatext-editor)
 
 ## License
 
