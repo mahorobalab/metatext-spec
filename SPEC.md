@@ -1,6 +1,6 @@
-# MetaText Sidecar Specification (`.metatext.jsonc`) v0.1
+# MetaText Sidecar Specification (`.metatext.jsonc`) v1
 
-> Status: Draft v0.1
+> Status: v1.0 (Canonical Schema URL: `https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json`)
 
 ## 1. Overview & Goals
 
@@ -28,30 +28,32 @@ Examples:
 
 ---
 
-## 3. JSONC Preservation & Interoperability Rules
+## 3. JSONC Preservation, Versioning & Interoperability Rules
 
 1. Sidecar files use **JSON with Comments (JSONC)** (line comments `//`, block comments `/* */`, and trailing commas allowed).
 2. Editors modifying `.metatext.jsonc` **MUST** perform targeted/AST edits (such as Microsoft `jsonc-parser` `modify`/`applyEdits`) rather than re-serializing the entire object, so existing comments and formatting remain intact.
-3. Unknown properties inside `extensions` or root-level `x-*` keys **MUST NOT** be deleted when another tool saves unrelated properties.
+3. Newly generated `.metatext.jsonc` files **SHOULD** include `"$schema": "https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json"` and `"version": "1.0"` at the top level for self-documentation and editor auto-completion.
+4. Unknown properties inside `extensions` or root-level `x-*` keys **MUST NOT** be deleted when another tool saves unrelated properties.
+5. **Versioning Policy**: The `v1` schema URL (`.../schemas/v1/metatext.schema.json`) receives only backward-compatible minor additions (`1.x`). Legacy draft files with `"version": "0.1"` remain valid under `v1`.
 
 ---
 
 ## 4. Schema Structure
 
-JSON Schema (draft-07): [`schemas/v0.1/metatext.schema.json`](schemas/v0.1/metatext.schema.json)
+JSON Schema (draft-07): [`schemas/v1/metatext.schema.json`](schemas/v1/metatext.schema.json)
 
 ### 4.1 Core Top-Level Properties
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `$schema` | `string` | Schema URL (`https://mahorobalab.github.io/metatext-spec/schemas/v0.1/metatext.schema.json`) |
-| `version` | `"0.1"` | Schema version |
+| `$schema` | `string` (URI) | Schema URL (`https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json`) |
+| `version` | `"1.0"` (or `1.x`, legacy `"0.1"`) | Schema version |
 | `format` | `"csv" \| "tsv" \| "log" \| "jsonl" \| "text"` | Explicit target format (auto-detected from extension if omitted) |
 | `readOnly` | `boolean` | Open target in read-only mode by default (recommended `true` for log files) |
 | `csv` | `object` | Dialect configuration for CSV/TSV files |
 | `jsonl` | `object` | Flattening and encoding configuration for JSON Lines (`.jsonl` / `.ndjson`) files |
 | `log` | `object` | Parsing and display configuration for log/text files |
-| `table` | `object` | Table-wide layout (`fontFamily`, `fontSize`, `defaultRowHeight`, `headerHeight`, `freezeColumns`) |
+| `table` | `object` | Table-wide layout (`fontFamily`, `fontSize`, `defaultRowHeight`, `headerHeight`, `freezeColumns`, `zebraStriping`) |
 | `view` | `object` | Persistent non-destructive view state (`sort`, `activeFilter`, `filterContextRows`, `filterPresets`, `markers`) |
 | `styles` | `Record<string, CellStyle>` | Named style dictionary |
 | `columns` | `Record<string, ColumnConfig>` | Per-column settings keyed by header name, capture group name, or 0-based index string |
@@ -85,7 +87,23 @@ JSON Schema (draft-07): [`schemas/v0.1/metatext.schema.json`](schemas/v0.1/metat
 - `wordWrap` (`boolean`, default `false`): Default line wrapping preference.
 - `encoding` (`"utf-8" | "utf-8-bom" | "shift-jis"`): Log file character encoding.
 
-### 4.3 Style Cascade Order
+### 4.3 `CellStyle` & `ColumnConfig`
+
+#### `CellStyle`
+- `bold`, `italic` (`boolean`)
+- `color`, `backgroundColor` (`string`, CSS color)
+- `fontFamily` (`string`), `fontSize` (`number`, `8..48`)
+- `wrap` (`boolean`): Wrap long text inside this cell or range.
+- `align` (`"left" | "center" | "right"`): Horizontal text alignment.
+- `numberFormat` (`string`): Excel-compatible number format string (ECMA-376 / `numfmt`, e.g. `#,##0`, `¥#,##0`, `0.0%`).
+
+#### `ColumnConfig`
+- `label` (`string`), `width` (`number`, `24..2000`), `visible` (`boolean`, default `true`)
+- `align` (`"left" | "center" | "right"`), `wrap` (`boolean`, default `false`), `readonly` (`boolean`, default `false`)
+- `type` (`"text" | "number" | "boolean" | "enum" | "date"`, default `"text"`), `options` (`string[]` for `enum`)
+- `numberFormat` (`string`), `style` (`StyleRef`: named style key or inline `CellStyle`)
+
+### 4.4 Style Cascade Order
 
 Resolved from lowest to highest precedence:
 1. `table` (defaults)
@@ -97,8 +115,8 @@ Resolved from lowest to highest precedence:
 
 ---
 
-## 5. Reserved Future Extensions (Post-v0.1)
+## 5. Reserved Future Extensions (Post-v1.0)
 
-The following capabilities are planned for future revisions while remaining backward-compatible with v0.1 sidecar files:
+The following capabilities are planned for future minor revisions (`1.x`) while remaining backward-compatible with v1.0 sidecar files:
 - **Portable Bundle (`.metatext.zip`)**: Packaging the source data file, `.metatext.jsonc`, and optional snapshot history into a single portable archive.
 - **Snapshot History Metadata**: Metadata referencing external/shadow Git snapshot repositories (e.g. `gix` object stores) for dataset + sidecar time travel.

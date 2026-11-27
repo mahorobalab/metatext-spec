@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MetaText Specification (.metatext.jsonc) v1</title>
+    <meta
+      name="description"
+      content="Open JSONC sidecar metadata specification (.metatext.jsonc) for CSV, TSV, JSONL, and Log files."
+    />
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: #121a2f;
+        --panel-border: #23304f;
+        --text: #e6edf7;
+        --muted: #98a6c3;
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.14);
+        --code-bg: #080d1a;
+        --ok: #34d399;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f8fafc;
+          --panel: #ffffff;
+          --panel-border: #e2e8f0;
+          --text: #0f172a;
+          --muted: #475569;
+          --accent: #0284c7;
+          --accent-soft: rgba(2, 132, 199, 0.1);
+          --code-bg: #f1f5f9;
+          --ok: #059669;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Yu Gothic UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.65;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 40px 20px 72px;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .badge {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid var(--panel-border);
+      }
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        margin: 32px 0 12px;
+        font-size: 19px;
+        letter-spacing: -0.01em;
+      }
+      p { margin: 0 0 14px; color: var(--muted); }
+      .lang-switch {
+        display: inline-flex;
+        gap: 6px;
+      }
+      .btn {
+        appearance: none;
+        border: 1px solid var(--panel-border);
+        background: var(--panel);
+        color: var(--text);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn:hover { border-color: var(--accent); color: var(--accent); }
+      .btn.active {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 18px;
+      }
+      .url-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        background: var(--code-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-top: 8px;
+      }
+      .url-row code {
+        flex: 1;
+        min-width: 240px;
+        word-break: break-all;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        color: var(--accent);
+      }
+      pre {
+        margin: 10px 0 0;
+        background: var(--code-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        overflow-x: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+      .item {
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        border-radius: 10px;
+        padding: 14px 16px;
+        text-decoration: none;
+        color: var(--text);
+        display: block;
+      }
+      .item:hover { border-color: var(--accent); }
+      .item strong { display: block; font-size: 14px; margin-bottom: 4px; }
+      .item span { font-size: 13px; color: var(--muted); }
+      footer {
+        margin-top: 40px;
+        padding-top: 18px;
+        border-top: 1px solid var(--panel-border);
+        font-size: 13px;
+        color: var(--muted);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      footer a { color: var(--accent); text-decoration: none; }
+      footer a:hover { text-decoration: underline; }
+      [data-lang="ja"] { display: none; }
+      body.ja [data-lang="en"] { display: none; }
+      body.ja [data-lang="ja"] { display: initial; }
+      body.ja div[data-lang="ja"],
+      body.ja p[data-lang="ja"] { display: block; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header>
+        <div class="brand">
+          <h1>MetaText Spec</h1>
+          <span class="badge">v1 · .metatext.jsonc</span>
+        </div>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button id="btn-en" class="btn active" type="button">English</button>
+          <button id="btn-ja" class="btn" type="button">日本語</button>
+        </div>
+      </header>
+
+      <p data-lang="en">
+        An open, human-readable JSONC sidecar metadata format (<code>&lt;file&gt;.metatext.jsonc</code>)
+        for CSV, TSV, JSONL, and Log files. Persist column layouts, parsing rules, filter presets,
+        row bookmarks, and conditional highlights without ever touching raw data files.
+      </p>
+      <p data-lang="ja">
+        CSV・TSV・JSONL・Log などのプレーンテキストに対して、元ファイルを一切汚さずに
+        列幅・パース設定・フィルタプリセット・行マーカー・条件付き書式・セル装飾を外付け保存する
+        オープンな JSONC サイドカー仕様（<code>&lt;file&gt;.metatext.jsonc</code>）です。
+      </p>
+
+      <section class="card">
+        <strong>
+          <span data-lang="en">Canonical JSON Schema URL (v1)</span>
+          <span data-lang="ja">公式 JSON Schema URL（v1）</span>
+        </strong>
+        <div class="url-row">
+          <code id="schema-url">https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json</code>
+          <button id="copy-url" class="btn" type="button">Copy URL</button>
+          <a class="btn" href="./schemas/v1/metatext.schema.json">Open JSON</a>
+        </div>
+      </section>
+
+      <h2>
+        <span data-lang="en">Quick Start</span>
+        <span data-lang="ja">クイックスタート</span>
+      </h2>
+      <div class="card">
+        <p data-lang="en">
+          Place <code>data.csv.metatext.jsonc</code> next to <code>data.csv</code>. Adding
+          <code>$schema</code> enables completion, hover docs, and validation in VS Code and other editors.
+        </p>
+        <p data-lang="ja">
+          <code>data.csv</code> の隣に <code>data.csv.metatext.jsonc</code> を配置します。先頭に
+          <code>$schema</code> を入れることで、VS Code などのエディタで入力補完・ホバー説明・バリデーションが効きます。
+        </p>
+        <pre><code id="snippet">{
+  "$schema": "https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json",
+  "version": "1.0",
+  "format": "csv",
+  "table": {
+    "freezeColumns": 1,
+    "defaultRowHeight": 28
+  },
+  "columns": {
+    "amount": { "align": "right", "numberFormat": "#,##0" }
+  }
+}</code></pre>
+      </div>
+
+      <h2>
+        <span data-lang="en">Specification &amp; Resources</span>
+        <span data-lang="ja">仕様書・リソース</span>
+      </h2>
+      <div class="grid">
+        <a class="item" href="./schemas/v1/metatext.schema.json">
+          <strong>JSON Schema (v1)</strong>
+          <span data-lang="en">Draft-07 schema for all formats</span>
+          <span data-lang="ja">全形式対応 Draft-07 スキーマ本体</span>
+        </a>
+        <a class="item" href="./SPEC.md">
+          <strong>SPEC.md</strong>
+          <span data-lang="en">Full specification &amp; style cascade rules</span>
+          <span data-lang="ja">詳細仕様・スタイル優先順位ルール</span>
+        </a>
+        <a class="item" href="https://github.com/mahorobalab/metatext-spec">
+          <strong>GitHub: metatext-spec</strong>
+          <span data-lang="en">Issues, PRs, and legacy v0.1 schema</span>
+          <span data-lang="ja">仕様リポジトリ・旧 v0.1 スキーマ</span>
+        </a>
+        <a class="item" href="https://github.com/mahorobalab/metatext-editor">
+          <strong>MetaText Editor</strong>
+          <span data-lang="en">Reference implementation (Desktop / VS Code / Web)</span>
+          <span data-lang="ja">リファレンス実装（Desktop / VS Code / Web）</span>
+        </a>
+      </div>
+
+      <h2>
+        <span data-lang="en">Examples</span>
+        <span data-lang="ja">フォーマット別サンプル</span>
+      </h2>
+      <div class="grid">
+        <a class="item" href="./examples/spec_setting.csv.metatext.jsonc">
+          <strong>CSV (Headerless)</strong>
+          <span>spec_setting.csv.metatext.jsonc</span>
+        </a>
+        <a class="item" href="./examples/metrics.tsv.metatext.jsonc">
+          <strong>TSV + View Sort</strong>
+          <span>metrics.tsv.metatext.jsonc</span>
+        </a>
+        <a class="item" href="./examples/events.jsonl.metatext.jsonc">
+          <strong>JSONL Flattening</strong>
+          <span>events.jsonl.metatext.jsonc</span>
+        </a>
+        <a class="item" href="./examples/app.log.metatext.jsonc">
+          <strong>Log Parser + Markers</strong>
+          <span>app.log.metatext.jsonc</span>
+        </a>
+      </div>
+
+      <footer>
+        <span>MIT License · MahorobaLab</span>
+        <span>
+          <a href="./README.md">README (EN)</a> ·
+          <a href="./README_ja.md">README (JA)</a> ·
+          <a href="./schemas/v0.1/metatext.schema.json">Legacy v0.1</a>
+        </span>
+      </footer>
+    </main>
+
+    <script>
+      const setLang = (lang) => {
+        document.body.classList.toggle('ja', lang === 'ja');
+        document.documentElement.lang = lang;
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        document.getElementById('btn-ja').classList.toggle('active', lang === 'ja');
+      };
+      if ((navigator.language || '').toLowerCase().startsWith('ja')) {
+        setLang('ja');
+      }
+      document.getElementById('btn-en').addEventListener('click', () => setLang('en'));
+      document.getElementById('btn-ja').addEventListener('click', () => setLang('ja'));
+      document.getElementById('copy-url').addEventListener('click', async (e) => {
+        const url = document.getElementById('schema-url').textContent;
+        await navigator.clipboard.writeText(url);
+        const btn = e.currentTarget;
+        const prev = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = prev; }, 1400);
+      });
+    </script>
+  </body>
+</html>

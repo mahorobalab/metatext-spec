@@ -1,6 +1,6 @@
 {
-  "$schema": "../schemas/v0.1/metatext.schema.json",
-  "version": "0.1",
+  "$schema": "https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json",
+  "version": "1.0",
   "format": "csv",
 
   // ヘッダー行が無い仕様一覧 CSV の例

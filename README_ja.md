@@ -1,13 +1,13 @@
 # MetaText 仕様 (`.metatext.jsonc`)
 
-[English (README.md)](./README.md) | [詳細仕様 (SPEC.md)](./SPEC.md)
+[English (README.md)](./README.md) | [詳細仕様 (SPEC.md)](./SPEC.md) | [Web ページ](https://mahorobalab.github.io/metatext-spec/)
 
 **MetaText** は、`CSV`・`TSV`・`Log`・`JSONL` などのプレーンテキストファイルに対して、データ本体を変更せずに見た目・パース設定・フィルタプリセット・行マーカー・条件付きハイライトなどを外付けで保存するためのオープンな JSONC サイドカー仕様（`<filename>.metatext.jsonc`）です。
 
 ## スキーマ・サンプル
 
-- JSON Schema (v0.1): [`schemas/v0.1/metatext.schema.json`](./schemas/v0.1/metatext.schema.json)
-- 公式配信 URL 予定: `https://mahorobalab.github.io/metatext-spec/schemas/v0.1/metatext.schema.json`
+- JSON Schema (v1): [`schemas/v1/metatext.schema.json`](./schemas/v1/metatext.schema.json)
+- 公式配信 URL: `https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json`
 - サンプル:
   - [`examples/spec_setting.csv.metatext.jsonc`](./examples/spec_setting.csv.metatext.jsonc)（ヘッダーなし CSV＋スタイル辞書＋条件付き書式）
   - [`examples/metrics.tsv.metatext.jsonc`](./examples/metrics.tsv.metatext.jsonc)（TSV＋列設定＋ビューソート）
@@ -20,8 +20,8 @@
 
 ```jsonc
 {
-  "$schema": "https://mahorobalab.github.io/metatext-spec/schemas/v0.1/metatext.schema.json",
-  "version": "0.1",
+  "$schema": "https://mahorobalab.github.io/metatext-spec/schemas/v1/metatext.schema.json",
+  "version": "1.0",
   "format": "csv",
   "table": {
     "freezeColumns": 1,

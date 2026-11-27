@@ -26,7 +26,7 @@ jobs:
           mkdir -p _site
           cp -r schemas _site/schemas
           cp -r examples _site/examples
-          cp README.md README_ja.md SPEC.md _site/
+          cp index.html README.md README_ja.md SPEC.md _site/
           touch _site/.nojekyll
 
       - name: Configure Pages
