@@ -115,8 +115,67 @@ Resolved from lowest to highest precedence:
 
 ---
 
-## 5. Reserved Future Extensions (Post-v1.0)
+## 5. Portable Bundle Format (`.metatext.zip`) v0.1
+
+For single-file sharing, archiving, and cross-environment transfer (Desktop, VS Code, Web), a source file, its `.metatext.jsonc` sidecar, and an optional Shadow Git snapshot history can be packaged into a standard DEFLATE ZIP archive with the suffix **`.metatext.zip`**.
+
+### 5.1 File Naming Convention
+
+Preserve the original source file extension before `.metatext.zip`:
+
+```text
+<sourceFileName>.metatext.zip
+```
+
+Examples:
+- `report.csv` → `report.csv.metatext.zip`
+- `metrics.tsv` → `metrics.tsv.metatext.zip`
+- `events.jsonl` → `events.jsonl.metatext.zip`
+- `app.log` → `app.log.metatext.zip`
+
+Tools **MUST NOT** treat arbitrary `.zip` files without the `.metatext.zip` suffix (or without a valid `manifest.json`) as MetaText bundles.
+
+### 5.2 Archive Layout
+
+```text
+report.csv.metatext.zip
+├── manifest.json                         # Required bundle manifest
+├── data/
+│   ├── report.csv                        # Required primary data file (encoding & line endings preserved)
+│   └── report.csv.metatext.jsonc         # Required sidecar metadata file
+└── history/                              # Optional Shadow Git bare repository (omitted by default)
+    ├── HEAD
+    ├── config
+    ├── objects/...
+    └── refs/...
+```
+
+### 5.3 `manifest.json` Schema
+
+JSON Schema (draft-07): [`schemas/v0.1/metatext-bundle.schema.json`](schemas/v0.1/metatext-bundle.schema.json)
+
+```json
+{
+  "bundleVersion": "0.1",
+  "format": "csv",
+  "sourceFile": "data/report.csv",
+  "sidecarFile": "data/report.csv.metatext.jsonc",
+  "includesHistory": false,
+  "createdAt": "2026-11-26T05:00:00Z",
+  "createdBy": "MetaText Editor v0.1.0"
+}
+```
+
+### 5.4 Validation, Direct Editing & Security Rules
+
+1. **Zip Slip Prevention**: Tools **MUST** reject any ZIP entry path or manifest path containing `..`, leading `/`, Windows drive prefixes (e.g. `C:`), or ASCII control characters.
+2. **Zip Bomb Prevention**: Tools **MUST** enforce limits on entry count (default `10,000`), total uncompressed size (default `512 MiB`), and suspicious compression ratios (default `> 100x` for entries `>= 1 MiB`) before extracting.
+3. **Privacy Default**: Export UIs **SHOULD** default `includesHistory` to `false` so local editing history is not unintentionally shared.
+4. **Atomic Direct Save**: Tools supporting direct editing of `.metatext.zip` **SHOULD** write updated archives to a temporary file and atomically rename over the original bundle, preserving `createdAt`, `createdBy`, and embedded `history/` entries.
+
+---
+
+## 6. Reserved Future Extensions (Post-v1.0)
 
 The following capabilities are planned for future minor revisions (`1.x`) while remaining backward-compatible with v1.0 sidecar files:
-- **Portable Bundle (`.metatext.zip`)**: Packaging the source data file, `.metatext.jsonc`, and optional snapshot history into a single portable archive.
 - **Snapshot History Metadata**: Metadata referencing external/shadow Git snapshot repositories (e.g. `gix` object stores) for dataset + sidecar time travel.

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mahorobalab.github.io/metatext-spec/schemas/v0.1/metatext-bundle.schema.json",
+  "title": "MetaText Portable Bundle Manifest",
+  "description": "Manifest file (manifest.json) inside a .metatext.zip portable archive containing a plain-text data file, its .metatext.jsonc sidecar, and an optional Shadow Git history repository.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bundleVersion",
+    "format",
+    "sourceFile",
+    "sidecarFile",
+    "includesHistory"
+  ],
+  "patternProperties": {
+    "^x-": {
+      "description": "Custom vendor or tool extension fields preserved across editors."
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "examples": [
+        "https://mahorobalab.github.io/metatext-spec/schemas/v0.1/metatext-bundle.schema.json"
+      ],
+      "description": "Optional JSON Schema URL for validation and editor completion."
+    },
+    "bundleVersion": {
+      "type": "string",
+      "const": "0.1",
+      "description": "Portable bundle format version."
+    },
+    "format": {
+      "type": "string",
+      "enum": ["csv", "tsv", "log", "jsonl", "text"],
+      "description": "Target plain-text format of sourceFile."
+    },
+    "sourceFile": {
+      "type": "string",
+      "pattern": "^data/[^/\\\\]+$",
+      "examples": ["data/report.csv", "data/events.jsonl", "data/app.log"],
+      "description": "Relative ZIP entry path to the primary data file under data/."
+    },
+    "sidecarFile": {
+      "type": "string",
+      "pattern": "^data/[^/\\\\]+\\.metatext\\.jsonc$",
+      "examples": [
+        "data/report.csv.metatext.jsonc",
+        "data/events.jsonl.metatext.jsonc"
+      ],
+      "description": "Relative ZIP entry path to the sidecar metadata file under data/."
+    },
+    "includesHistory": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the archive contains an embedded Shadow Git bare repository under history/. Defaults to false on export for privacy."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "examples": ["2026-11-26T05:00:00Z"],
+      "description": "ISO 8601 UTC timestamp when the bundle was first created."
+    },
+    "createdBy": {
+      "type": "string",
+      "examples": ["MetaText Editor v0.1.0"],
+      "description": "Name and version of the tool that created the bundle."
+    }
+  }
+}
